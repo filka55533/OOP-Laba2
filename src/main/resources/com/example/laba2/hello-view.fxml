@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<Pane fx:id="paneRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="771.0" prefWidth="879.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.laba2.HelloController">
+   <children>
+      <MenuButton fx:id="mbFigure" layoutX="139.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0">
+        <items>
+          <MenuItem fx:id="miCircle" mnemonicParsing="false" onAction="#onCircleAction" text="Circle" />
+          <MenuItem fx:id="miEllipse" mnemonicParsing="false" onAction="#onEllipseAction" text="Ellipse" />
+            <MenuItem fx:id="miPolyLine" mnemonicParsing="false" onAction="#onPolyLineAction" text="Polyline" />
+            <MenuItem fx:id="miRectangle" mnemonicParsing="false" onAction="#onRectangleAction" text="Rectangle" />
+            <MenuItem fx:id="miSegment" mnemonicParsing="false" onAction="#onSegmentAction" text="Segment" />
+            <MenuItem fx:id="miSquare" mnemonicParsing="false" onAction="#onSquareAction" text="Square" />
+            <MenuItem fx:id="miTriangle" mnemonicParsing="false" onAction="#onTriangleAction" text="Triangle" />
+        </items>
+         <font>
+            <Font size="14.0" />
+         </font>
+      </MenuButton>
+      <Label layoutX="42.0" layoutY="14.0" text="Figure:">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Canvas fx:id="canvas" height="200.0" layoutX="133.0" layoutY="146.0" onMouseClicked="#onCanvasClick" width="200.0" />
+   </children>
+</Pane>
