@@ -6,4 +6,8 @@ public abstract class OpenFigure extends Figure{
         super(startPoint);
         this.endPoint = endPoint;
     }
+
+    public Point getEndPoint() {
+        return endPoint;
+    }
 }

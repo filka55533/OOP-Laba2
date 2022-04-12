@@ -6,4 +6,8 @@ public abstract class SecondOrderFigures extends ClosedFigure{
         super(startPoint);
         this.endPoint = endPoint;
     }
+
+    public Point getEndPoint() {
+        return endPoint;
+    }
 }

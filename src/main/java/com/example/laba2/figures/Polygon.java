@@ -7,6 +7,10 @@ public abstract class Polygon extends ClosedFigure{
         this.points = points.clone();
     }
 
+    public Point[] getPoints() {
+        return points;
+    }
+
     @Override
     public boolean isItFigurePoint(double x, double y) {
         int len = points.length;

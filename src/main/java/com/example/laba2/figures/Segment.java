@@ -2,11 +2,17 @@ package com.example.laba2.figures;
 
 public class Segment extends OpenFigure{
     public double radius;
+    private boolean isItDown;
     private Point midCord;
     public Segment(Point startPoint, Point endPoint, double radius, boolean isItDown){
         super(startPoint, endPoint);
         this.radius = radius;
+        this.isItDown = isItDown;
         midCord = getMid(startPoint, endPoint, radius, isItDown);
+    }
+
+    public boolean getIsItDown(){
+        return isItDown;
     }
 
     public Point getMid(Point pnt1, Point pnt2, double radius, boolean isItDown){

@@ -1,7 +1,7 @@
 package com.example.laba2.figures;
 
 public class Rectangle extends Polygon{
-    double width, height;
+    protected double width, height;
     public Rectangle(Point startPoint, double width, double height){
         super(startPoint,
               new Point(startPoint.x + width, startPoint.y),
@@ -10,6 +10,14 @@ public class Rectangle extends Polygon{
         );
         this.width = width;
         this.height = height;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public double getWidth() {
+        return width;
     }
 
     @Override

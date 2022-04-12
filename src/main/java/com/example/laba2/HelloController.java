@@ -14,13 +14,19 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 
-interface Drawing{
+interface Initializing{
     void run();
 }
 
+interface Drawing{
+    void draw();
+}
 
 public class HelloController {
-    Drawing drawingMethod;
+
+    private final double STEP = 10e-3;
+    Initializing initMethod;
+    Drawing drawMethod;
     private int pointsCount;
     private boolean isWaitRightClick = false;
     private Figure figure;
@@ -38,8 +44,6 @@ public class HelloController {
     public double getVerticalOffset(){
         return mbFigure.getLayoutY() + mbFigure.getHeight() + 50.0;
     }
-
-
 
     @FXML
     private Pane paneRoot;
@@ -63,56 +67,65 @@ public class HelloController {
 
     @FXML
     public void onCircleAction() {
+        isWaitRightClick = false;
         setMbFigureText(miCircle.getText());
         clearPoints();
         pointsCount = 2;
-        drawingMethod = this::initCircle;
+        initMethod = this::initCircle;
+        drawMethod = this::drawCircle;
 
     }
     @FXML
     public void onEllipseAction() {
+        isWaitRightClick = false;
         setMbFigureText(miEllipse.getText());
         clearPoints();
         pointsCount = 2;
-        drawingMethod = this::initEllipse;
-
+        initMethod = this::initEllipse;
+        drawMethod = this::drawEllipse;
     }
     @FXML
     public void onTriangleAction() {
+        isWaitRightClick = false;
         setMbFigureText(miTriangle.getText());
         clearPoints();
         pointsCount = 3;
-        drawingMethod = this::initTriangle;
+        initMethod = this::initTriangle;
+        drawMethod = this::drawTriangle;
     }
     @FXML
     public void onSquareAction() {
+        isWaitRightClick = false;
         setMbFigureText(miSquare.getText());
         clearPoints();
         pointsCount = 2;
-        drawingMethod = this::initSquare;
+        initMethod = this::initSquare;
+        drawMethod = this::drawRectangle;
     }
     @FXML
     public void onPolyLineAction() {
         setMbFigureText(miPolyLine.getText());
         clearPoints();
         isWaitRightClick = true;
-        drawingMethod = this::initPolyLine;
-
+        initMethod = this::initPolyLine;
+        drawMethod = this::drawPolyLine;
     }
     @FXML
     public void onRectangleAction() {
         setMbFigureText(miRectangle.getText());
         clearPoints();
         pointsCount = 2;
-        drawingMethod = this::initRectangle;
+        initMethod = this::initRectangle;
+        drawMethod = this::drawRectangle;
     }
     @FXML
     public void onSegmentAction() {
+        isWaitRightClick = false;
         setMbFigureText(miSegment.getText());
         clearPoints();
         pointsCount = 3;
-        drawingMethod = this::initSegment;
-
+        initMethod = this::initSegment;
+        drawMethod = this::drawSegment;
     }
     @FXML
     public void onCanvasClick(MouseEvent mouseEvent) {
@@ -120,18 +133,114 @@ public class HelloController {
         points.add(pnt);
         if (isWaitRightClick){
             if (mouseEvent.getButton() != MouseButton.SECONDARY) return;
-            isWaitRightClick = false;
-            drawingMethod.run();
-            drawFigure();
+            initMethod.run();
+//            drawFigure();
+            drawMethod.draw();
             clearPoints();
         }
         else if(mbFigure.getText() != "")  {
             if (pointsCount <= points.toArray().length) {
-                drawingMethod.run();
-                drawFigure();
+                initMethod.run();
+//                drawFigure();
+                drawMethod.draw();
                 clearPoints();
             }
         }
+    }
+
+    private void drawTriangle(){
+        Triangle trg = (Triangle) figure;
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.setLineWidth(2);
+        Point[] points = trg.getPoints();
+        gc.moveTo(points[0].x, points[0].y);
+        for (int i = 0; i <= points.length; i++)
+            gc.lineTo(points[i % points.length].x, points[i % points.length].y);
+
+        gc.stroke();
+    }
+
+    private void drawCircle(){
+        double rad = ((Circle)figure).getRadius();
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.setLineWidth(2);
+        gc.moveTo(figure.startPoint.x + rad, figure.startPoint.y );
+        for (double i = 0; i < 2 * Math.PI; i += STEP / rad){
+            double x = rad * Math.cos(i) + figure.startPoint.x;
+            double y = rad * Math.sin(i) + figure.startPoint.y;
+            gc.lineTo(x, y);
+        }
+        gc.stroke();
+    }
+
+    private void drawEllipse(){
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.setLineWidth(2);
+        double a = Math.abs(figure.startPoint.x - ((Ellipse)figure).getEndPoint().x) / 2.0;
+        double b = Math.abs(figure.startPoint.y - ((Ellipse)figure).getEndPoint().y) / 2.0;
+        gc.moveTo( figure.startPoint.x + 2 * a,  figure.startPoint.y + b);
+        for (double i = 0; i < 2 * Math.PI; i += STEP){
+            double x = a * Math.cos(i) + figure.startPoint.x + a;
+            double y = b * Math.sin(i) + figure.startPoint.y + b;
+            gc.lineTo(x, y);
+        }
+        gc.stroke();
+    }
+
+    private void drawPolyLine(){
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.setLineWidth(2);
+        gc.moveTo(points.get(0).x, points.get(0).y);
+        for (int i = 1; i < points.toArray().length; i++){
+            Point point = points.get(i);
+            gc.lineTo(point.x, point.y);
+        }
+        gc.stroke();
+    }
+
+    private void drawRectangle(){
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setLineWidth(2);
+        gc.setFill(Color.BLACK);
+        Rectangle rect = (Rectangle)figure;
+        double width = rect.getWidth(), height = rect.getHeight();
+        double x = rect.startPoint.x, y = rect.startPoint.y;
+        gc.moveTo(x, y);
+        for (int i = 0; i < 4; i++){
+            x = (i <= 1) ? rect.startPoint.x + width : rect.startPoint.x;
+            y = (i >= 1 && i <= 2) ? rect.startPoint.y + height : rect.startPoint.y;
+            gc.lineTo(x, y);
+        }
+        gc.stroke();
+    }
+
+    private void drawSegment(){
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.setFill(Color.BLACK);
+        gc.setLineWidth(2);
+        Segment seg = (Segment)figure;
+        Point midPnt = seg.getMid(seg.startPoint, seg.getEndPoint(), seg.radius, seg.getIsItDown());
+        double startAngle = Math.atan((midPnt.y - seg.startPoint.y)/(midPnt.x - seg.startPoint.x));
+        double endAngle = Math.atan((midPnt.y - seg.getEndPoint().y)/(midPnt.x - seg.getEndPoint().x));
+
+        if (endAngle < startAngle) {
+            startAngle += endAngle;
+            endAngle = startAngle - endAngle;
+            startAngle = startAngle - endAngle;
+        }
+        for (double i = startAngle; i < endAngle; i += STEP){
+            double x = midPnt.x + seg.radius * Math.cos(i);
+            double y = midPnt.y + seg.radius * Math.sin(i);
+            if (i - startAngle < STEP)
+                gc.moveTo(x, y);
+            gc.lineTo(x, y);
+        }
+
+        gc.stroke();
     }
 
     private void initCircle(){
@@ -156,7 +265,7 @@ public class HelloController {
     }
 
     private void initSegment(){
-        boolean isItDown = points.get(1).y < points.get(2).y ? true : false;
+        boolean isItDown = points.get(1).y < points.get(2).y ? false : true;
         double y = Math.abs(points.get(1).y - points.get(0).y)/2.0;
         double x = Math.abs(points.get(1).x - points.get(0).x)/2.0;
         Point midPnt = new Point(x, y);
@@ -180,7 +289,7 @@ public class HelloController {
         double step = 10e-2;
         for (double x = 0; x < canvas.getWidth(); x += step) {
             for (double y = 0; y < canvas.getHeight(); y += step)
-                if (figure.isItFigurePoint(x, y)) {
+                if (figure.isItFigurePoint(x, y)){
                     gc.moveTo(x, y);
                     gc.lineTo(x, y);
                 }
