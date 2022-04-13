@@ -24,12 +24,18 @@ interface Drawing{
 
 public class HelloController {
 
-    private final double STEP = 10e-3;
+    private static final double STEP = 10e-3;
     Initializing initMethod;
     Drawing drawMethod;
     private int pointsCount;
+
+    //Flag for drawing polylines
     private boolean isWaitRightClick = false;
+
+    //Common object
     private Figure figure;
+
+    //Saved user's points
     private ArrayList<Point> points;
     private void clearPoints(){
         points = new ArrayList<>();
@@ -58,6 +64,7 @@ public class HelloController {
     }
 
     @FXML
+    //Items for figures
     private MenuItem miCircle, miEllipse, miPolyLine, miRectangle, miSegment, miSquare, miTriangle;
 
 
@@ -66,6 +73,7 @@ public class HelloController {
     }
 
     @FXML
+    // Choose circle
     public void onCircleAction() {
         isWaitRightClick = false;
         setMbFigureText(miCircle.getText());
@@ -76,6 +84,7 @@ public class HelloController {
 
     }
     @FXML
+    //Choose ellipse
     public void onEllipseAction() {
         isWaitRightClick = false;
         setMbFigureText(miEllipse.getText());
@@ -85,6 +94,7 @@ public class HelloController {
         drawMethod = this::drawEllipse;
     }
     @FXML
+    //Choose triangle
     public void onTriangleAction() {
         isWaitRightClick = false;
         setMbFigureText(miTriangle.getText());
@@ -94,6 +104,7 @@ public class HelloController {
         drawMethod = this::drawTriangle;
     }
     @FXML
+    //Choose square
     public void onSquareAction() {
         isWaitRightClick = false;
         setMbFigureText(miSquare.getText());
@@ -103,14 +114,17 @@ public class HelloController {
         drawMethod = this::drawRectangle;
     }
     @FXML
+    //Choose polyline
     public void onPolyLineAction() {
         setMbFigureText(miPolyLine.getText());
         clearPoints();
+        //On right click stop getting point
         isWaitRightClick = true;
         initMethod = this::initPolyLine;
         drawMethod = this::drawPolyLine;
     }
     @FXML
+    //Choose rectangle
     public void onRectangleAction() {
         setMbFigureText(miRectangle.getText());
         clearPoints();
@@ -119,6 +133,7 @@ public class HelloController {
         drawMethod = this::drawRectangle;
     }
     @FXML
+    //Choose segment
     public void onSegmentAction() {
         isWaitRightClick = false;
         setMbFigureText(miSegment.getText());
@@ -128,26 +143,20 @@ public class HelloController {
         drawMethod = this::drawSegment;
     }
     @FXML
+    //Process user's clicks
     public void onCanvasClick(MouseEvent mouseEvent) {
         Point pnt = new Point(mouseEvent.getX(), mouseEvent.getY());
         points.add(pnt);
-        if (isWaitRightClick){
-            if (mouseEvent.getButton() != MouseButton.SECONDARY) return;
-            initMethod.run();
-//            drawFigure();
-            drawMethod.draw();
-            clearPoints();
-        }
-        else if(mbFigure.getText() != "")  {
-            if (pointsCount <= points.toArray().length) {
-                initMethod.run();
-//                drawFigure();
-                drawMethod.draw();
-                clearPoints();
-            }
-        }
+        if (isWaitRightClick && mouseEvent.getButton() != MouseButton.SECONDARY) return;
+        else if(mbFigure.getText() == "")  return;
+        else if (pointsCount > points.toArray().length) return;
+
+        initMethod.run();
+        drawMethod.draw();
+        clearPoints();
     }
 
+    //Drawing figures section
     private void drawTriangle(){
         Triangle trg = (Triangle) figure;
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -243,6 +252,7 @@ public class HelloController {
         gc.stroke();
     }
 
+    //Initialize figure according items
     private void initCircle(){
         double radius = Figure.getDistanceBetweenTwoPoints(points.get(0), points.get(1));
         figure = new Circle(points.get(0), radius);
@@ -280,21 +290,6 @@ public class HelloController {
 
     private void initTriangle(){
         figure = new Triangle(points.get(0), points.get(1), points.get(2));
-    }
-
-    public void drawFigure(){
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.BLACK);
-        gc.setLineWidth(2);
-        double step = 10e-2;
-        for (double x = 0; x < canvas.getWidth(); x += step) {
-            for (double y = 0; y < canvas.getHeight(); y += step)
-                if (figure.isItFigurePoint(x, y)){
-                    gc.moveTo(x, y);
-                    gc.lineTo(x, y);
-                }
-        }
-        gc.stroke();
     }
 
 }
